@@ -2,9 +2,9 @@ const Task = require('../models/Task');
 const asyncWrapper = require('../middleware/async');
 
 
-const getAllTasks = asyncWrapper (async (req,res) => {
+const getAllTasks = asyncWrapper (async (req,res,next) => {
     const tasks = await Task.find({});
-    status(201).json({tasks});
+    res.status(200).json({ tasks });
 });
 
 const createTask = asyncWrapper (async (req, res) => {
@@ -16,6 +16,8 @@ const getTask = asyncWrapper (async (req, res) => {
         const {id:taskID} = req.params;
         const task = await Task.findOne({_id:taskID});
         if(!task){
+            const error = new Error('Not Found');
+            error.status = 404;
             return res.status(404).json({msg:`No task with id : ${taskID}`});
         };
         res.status(201).json({task});
